@@ -50,13 +50,13 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:gra
   <label>Gebiet <select id="area"></select></label>
   <label>Datum <input type="date" id="date"></label>
   <label>Toleranz ± <input type="number" id="tol" value="5" min="0.5" max="15" step="0.5"> °</label>
-  <label>Min. Länge <input type="number" id="minlen" value="500" min="300" max="3000" step="100" style="width:72px"> m</label>
+  <label>Min. Länge <input type="number" id="minlen" value="1000" min="300" max="3000" step="100" style="width:72px"> m</label>
   <div class="sun"><span class="rise">Sonnenaufgang <b id="riseT">–</b> · Azimut <b id="riseA">–</b></span><span class="set">Sonnenuntergang <b id="setT">–</b> · Azimut <b id="setA">–</b></span></div>
 </header>
 <main>
   <div id="mapwrap"><canvas id="c"></canvas><div id="tip"></div>
     <div id="zoom"><button id="zin" title="Vergrößern">+</button><button id="zout" title="Verkleinern">−</button><button id="zfit" title="Ganz Berlin" style="font-size:13px">Alle</button></div>
-    <div id="legend"><div id="lhead" style="cursor:pointer"><span class="sw" id="lsw"></span><b id="ltxt"></b> <span id="lcar" aria-hidden="true">▾</span></div><label><input type="checkbox" id="both"> Auch die andere Liste zeigen</label><label><input type="checkbox" id="grid" checked> Raster <select id="gsize"><option value="250">250 m</option><option value="500" selected>500 m</option><option value="1000">1 km</option></select></label><label><input type="checkbox" id="roads" checked> Alle Straßen</label><label>Straßennamen <select id="names"><option value="off">aus</option><option value="major" selected>große Straßen</option><option value="all">alle (ab Zoom)</option></select></label><label><input type="checkbox" id="mway"> Autobahnen einbeziehen</label></div>
+    <div id="legend"><div id="lhead" style="cursor:pointer"><span class="sw" id="lsw"></span><b id="ltxt"></b> <span id="lcar" aria-hidden="true">▾</span></div><label><input type="checkbox" id="both"> Auch die andere Liste zeigen</label><label><input type="checkbox" id="grid" checked> Raster <select id="gsize"><option value="250">250 m</option><option value="500">500 m</option><option value="1000" selected>1 km</option></select></label><label><input type="checkbox" id="roads" checked> Alle Straßen</label><label>Straßennamen <select id="names"><option value="off">aus</option><option value="major" selected>große Straßen</option><option value="all">alle (ab Zoom)</option></select></label><label><input type="checkbox" id="mway"> Autobahnen einbeziehen</label></div>
     <div id="status"><div id="stxt">Starte…</div><div id="bar"><i></i></div></div></div>
   <aside id="side">
     <div class="tabs"><button class="rise on" id="tabR">Sonnenaufgang <span id="cR"></span></button><button class="set" id="tabS">Sonnenuntergang <span id="cS"></span></button></div>
@@ -151,7 +151,7 @@ const cellName=s=>colName(Math.max(0,s.col))+(Math.max(0,s.row)+1);
 
 
 /* ---------- Gebiet (Bezirk) & Raster ---------- */
-let AREA={name:'Berlin',rings:[],ext:null}, G=500, ORG={x:0,y:0};
+let AREA={name:'Berlin',rings:[],ext:null}, G=1000, ORG={x:0,y:0};
 function ringsExt(rings){const e={x0:1e9,x1:-1e9,y0:1e9,y1:-1e9};for(const r of rings)for(const [x,y] of r){e.x0=Math.min(e.x0,x);e.x1=Math.max(e.x1,x);e.y0=Math.min(e.y0,y);e.y1=Math.max(e.y1,y);}return e;}
 function pip(x,y,ring){let c=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c;}return c;}
 function inRings(x,y,rings){for(const r of rings)if(pip(x,y,r))return true;return false;}
@@ -368,7 +368,7 @@ $('csv').onclick=()=>{
 
 /* ---------- Start ---------- */
 function setTab(t){tab=t;$('tabR').classList.toggle('on',t==='rise');$('tabS').classList.toggle('on',t==='set');selected=null;renderList();draw();}
-(function(){const sel=$('area');sel.innerHTML='<option value="Berlin">Ganz Berlin</option>'+BEZ.map(z=>`<option${z.n==='Friedrichshain-Kreuzberg'?' selected':''}>${z.n}</option>`).join('');})();
+(function(){const sel=$('area');sel.innerHTML='<option value="Berlin" selected>Ganz Berlin</option>'+BEZ.map(z=>`<option>${z.n}</option>`).join('');})();
 $('area').onchange=()=>{setArea($('area').value);selected=null;computeMatches();fit();};
 $('mway').onchange=()=>{selected=null;computeMatches();};
 $('gsize').onchange=()=>{G=+$('gsize').value;assignCells();computeMatches();};
